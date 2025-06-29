@@ -3,282 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HezwinKey Yönetim Paneli</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>HezwinKey Lisans Sistemi</title>
     <style>
-        /* Türkçe font ve renk düzenlemeleri */
         body {
-            background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
         }
-        .login-container {
-            max-width: 400px;
-            margin: 100px auto;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            background: white;
         }
-        .dashboard {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 20px;
-        }
-        .key-card {
-            transition: all 0.3s;
+        .form-group {
             margin-bottom: 20px;
         }
-        .key-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        .navbar-brand {
+        label {
+            display: block;
+            margin-bottom: 8px;
             font-weight: bold;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+        .key-list {
+            margin-top: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
-    <!-- Giriş Formu (Başlangıçta görünür) -->
-    <div id="login-container" class="login-container">
-        <h2 class="text-center mb-4">HezwinKey Giriş</h2>
-        <div class="mb-3">
-            <label for="username" class="form-label">Kullanıcı Adı</label>
-            <input type="text" class="form-control" id="username" placeholder="HEZWIN">
-        </div>
-        <div class="mb-3">
-            <label for="password" class="form-label">Şifre</label>
-            <input type="password" class="form-control" id="password" placeholder="HEZWIN123">
-        </div>
-        <button id="login-btn" class="btn btn-primary w-100">Giriş Yap</button>
-        <div id="login-error" class="text-danger mt-2 text-center"></div>
-    </div>
-
-    <!-- Kontrol Paneli (Giriş yapılana kadar gizli) -->
-    <div id="dashboard" class="dashboard" style="display: none;">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">HezwinKey Yönetim</a>
-                <button class="btn btn-danger ms-auto" id="logout-btn">Çıkış Yap</button>
-            </div>
-        </nav>
-
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h5>Yeni Anahtar Oluştur</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="key-name" class="form-label">Anahtar Adı</label>
-                            <input type="text" class="form-control" id="key-name" placeholder="Örn: DenemeKey">
-                        </div>
-                        <div class="mb-3">
-                            <label for="key-duration" class="form-label">Süre</label>
-                            <select class="form-select" id="key-duration">
-                                <option value="1">1 Saat</option>
-                                <option value="3">3 Saat</option>
-                                <option value="12">12 Saat</option>
-                                <option value="24">1 Gün</option>
-                                <option value="72">3 Gün</option>
-                                <option value="168">7 Gün</option>
-                                <option value="360">15 Gün</option>
-                                <option value="720">30 Gün</option>
-                                <option value="1440">60 Gün</option>
-                            </select>
-                        </div>
-                        <button id="generate-key" class="btn btn-success w-100">Anahtar Oluştur</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h5>Anahtar Kontrol</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="check-key" class="form-label">Anahtar</label>
-                            <input type="text" class="form-control" id="check-key" placeholder="Anahtar girin">
-                        </div>
-                        <button id="check-key-btn" class="btn btn-info w-100 mb-3">Anahtarı Kontrol Et</button>
-                        <div id="key-result" class="alert" style="display: none;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card mt-4">
-            <div class="card-header bg-primary text-white">
-                <h5>Aktif Anahtarlar</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Anahtar</th>
-                                <th>Oluşturulma Tarihi</th>
-                                <th>Bitiş Tarihi</th>
-                                <th>Kalan Süre</th>
-                                <th>Durum</th>
-                                <th>İşlem</th>
-                            </tr>
-                        </thead>
-                        <tbody id="keys-table">
-                            <!-- Anahtarlar buraya yüklenecek -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Basit giriş kontrolü
-        document.getElementById('login-btn').addEventListener('click', function() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            if(username === "HEZWIN" && password === "HEZWIN123") {
-                document.getElementById('login-container').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-                loadKeys();
-            } else {
-                document.getElementById('login-error').textContent = "Hatalı kullanıcı adı veya şifre!";
-            }
-        });
-
-        // Çıkış yap
-        document.getElementById('logout-btn').addEventListener('click', function() {
-            document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('login-container').style.display = 'block';
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-        });
-
-        // Anahtar oluştur
-        document.getElementById('generate-key').addEventListener('click', function() {
-            const keyName = document.getElementById('key-name').value;
-            const duration = document.getElementById('key-duration').value;
-            
-            if(!keyName) {
-                alert("Lütfen bir anahtar adı girin!");
-                return;
-            }
-            
-            // Gerçek uygulamada bu Netlify fonksiyonunu çağırır
-            const newKey = generateRandomKey();
-            const createdAt = new Date();
-            const expiresAt = new Date(createdAt.getTime() + duration * 60 * 60 * 1000);
-            
-            // Demo amaçlı localStorage'a kaydet
-            const keys = JSON.parse(localStorage.getItem('hezwin_keys') || '[]');
-            keys.push({
-                key: newKey,
-                name: keyName,
-                createdAt: createdAt.toISOString(),
-                expiresAt: expiresAt.toISOString(),
-                active: true
-            });
-            localStorage.setItem('hezwin_keys', JSON.stringify(keys));
-            
-            alert(`Yeni anahtar oluşturuldu: ${newKey}\nSüre: ${duration} saat`);
-            document.getElementById('key-name').value = '';
-            loadKeys();
-        });
-
-        // Anahtar kontrol
-        document.getElementById('check-key-btn').addEventListener('click', function() {
-            const key = document.getElementById('check-key').value;
-            const resultDiv = document.getElementById('key-result');
-            
-            if(!key) {
-                resultDiv.textContent = "Lütfen bir anahtar girin!";
-                resultDiv.className = "alert alert-warning";
-                resultDiv.style.display = "block";
-                return;
-            }
-            
-            // Gerçek uygulamada bu Netlify fonksiyonunu çağırır
-            const keys = JSON.parse(localStorage.getItem('hezwin_keys') || '[]');
-            const foundKey = keys.find(k => k.key === key);
-            
-            if(!foundKey) {
-                resultDiv.textContent = "Geçersiz anahtar!";
-                resultDiv.className = "alert alert-danger";
-            } else {
-                const now = new Date();
-                const expiresAt = new Date(foundKey.expiresAt);
-                
-                if(expiresAt < now) {
-                    resultDiv.textContent = "Anahtarın süresi dolmuş!";
-                    resultDiv.className = "alert alert-danger";
-                } else {
-                    const timeLeft = Math.floor((expiresAt - now) / (1000 * 60 * 60));
-                    resultDiv.textContent = `Anahtar geçerli! Kalan süre: ${timeLeft} saat`;
-                    resultDiv.className = "alert alert-success";
-                }
-            }
-            
-            resultDiv.style.display = "block";
-        });
-
-        // Anahtarları yükle
-        function loadKeys() {
-            const keys = JSON.parse(localStorage.getItem('hezwin_keys') || '[]');
-            const tableBody = document.getElementById('keys-table');
-            tableBody.innerHTML = '';
-            
-            const now = new Date();
-            
-            keys.forEach(key => {
-                const createdAt = new Date(key.createdAt);
-                const expiresAt = new Date(key.expiresAt);
-                const timeLeft = expiresAt > now ? 
-                    Math.floor((expiresAt - now) / (1000 * 60 * 60)) + ' saat' : 
-                    'Süre doldu';
-                
-                const status = expiresAt > now ? 
-                    '<span class="badge bg-success">Aktif</span>' : 
-                    '<span class="badge bg-danger">Pasif</span>';
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${key.key}</td>
-                    <td>${createdAt.toLocaleString('tr-TR')}</td>
-                    <td>${expiresAt.toLocaleString('tr-TR')}</td>
-                    <td>${timeLeft}</td>
-                    <td>${status}</td>
-                    <td><button class="btn btn-sm btn-danger delete-btn" data-key="${key.key}">Sil</button></td>
-                `;
-                tableBody.appendChild(row);
-            });
-            
-            // Silme butonlarına event ekle
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const keyToDelete = this.getAttribute('data-key');
-                    const keys = JSON.parse(localStorage.getItem('hezwin_keys') || '[]');
-                    const updatedKeys = keys.filter(k => k.key !== keyToDelete);
-                    localStorage.setItem('hezwin_keys', JSON.stringify(updatedKeys));
-                    loadKeys();
-                });
-            });
-        }
+    <div class="container">
+        <h1>HezwinKey Lisans Yönetimi</h1>
         
-        // Rastgele anahtar oluşturma fonksiyonu
+        <div class="form-group">
+            <h2>Lisans Kontrol</h2>
+            <label for="licenseKey">Lisans Anahtarı:</label>
+            <input type="text" id="licenseKey" placeholder="HEZWIN-XXXXXXXXXXXX">
+            <button onclick="checkLicense()">Kontrol Et</button>
+            <div id="checkResult" class="result"></div>
+        </div>
+
+        <div class="form-group">
+            <h2>Yeni Lisans Oluştur</h2>
+            <label for="keyName">Anahtar Adı:</label>
+            <input type="text" id="keyName" placeholder="Örn: Ücretsiz Deneme">
+            
+            <label for="duration">Süre:</label>
+            <select id="duration">
+                <option value="1">1 Saat</option>
+                <option value="3">3 Saat</option>
+                <option value="24">1 Gün</option>
+                <option value="168">7 Gün</option>
+                <option value="720">30 Gün</option>
+            </select>
+            
+            <button onclick="generateLicense()">Anahtar Oluştur</button>
+            <div id="generateResult" class="result"></div>
+        </div>
+
+        <div class="key-list">
+            <h2>Aktif Lisanslar</h2>
+            <table id="licenseTable">
+                <thead>
+                    <tr>
+                        <th>Anahtar</th>
+                        <th>Oluşturulma</th>
+                        <th>Süre</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody id="licenseTableBody">
+                    <!-- Lisanslar buraya eklenecek -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // LocalStorage kullanarak basit veritabanı
+        if (!localStorage.getItem('licenses')) {
+            localStorage.setItem('licenses', JSON.stringify([]));
+        }
+
+        // Rastgele anahtar oluşturma
         function generateRandomKey() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let result = 'HEZWIN-';
-            for (let i = 0; i < 12; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            let key = 'HEZWIN-';
+            for (let i = 0; i < 9; i++) {
+                key += chars.charAt(Math.floor(Math.random() * chars.length));
             }
-            return result;
+            return key;
         }
+
+        // Lisans kontrolü
+        function checkLicense() {
+            const key = document.getElementById('licenseKey').value.trim();
+            const resultDiv = document.getElementById('checkResult');
+            
+            if (!key.startsWith('HEZWIN-') || key.length !== 16) {
+                showResult(resultDiv, 'Geçersiz anahtar formatı!', false);
+                return;
+            }
+
+            const licenses = JSON.parse(localStorage.getItem('licenses'));
+            const found = licenses.find(license => license.key === key);
+
+            if (!found) {
+                showResult(resultDiv, 'Geçersiz lisans anahtarı!', false);
+                return;
+            }
+
+            const now = new Date();
+            const expires = new Date(found.createdAt);
+            expires.setHours(expires.getHours() + parseInt(found.duration));
+
+            if (now > expires) {
+                showResult(resultDiv, 'Lisans süresi dolmuş!', false);
+            } else {
+                const hoursLeft = Math.round((expires - now) / (1000 * 60 * 60));
+                showResult(resultDiv, `Lisans geçerli! Kalan süre: ${hoursLeft} saat`, true);
+            }
+        }
+
+        // Yeni lisans oluşturma
+        function generateLicense() {
+            const name = document.getElementById('keyName').value.trim();
+            const duration = document.getElementById('duration').value;
+            const resultDiv = document.getElementById('generateResult');
+            
+            if (!name) {
+                showResult(resultDiv, 'Lütfen bir anahtar adı girin!', false);
+                return;
+            }
+
+            const newKey = generateRandomKey();
+            const newLicense = {
+                key: newKey,
+                name: name,
+                duration: duration,
+                createdAt: new Date().toISOString()
+            };
+
+            const licenses = JSON.parse(localStorage.getItem('licenses'));
+            licenses.push(newLicense);
+            localStorage.setItem('licenses', JSON.stringify(licenses));
+
+            showResult(resultDiv, `Yeni anahtar oluşturuldu: ${newKey}`, true);
+            document.getElementById('keyName').value = '';
+            updateLicenseTable();
+        }
+
+        // Lisans tablosunu güncelleme
+        function updateLicenseTable() {
+            const tbody = document.getElementById('licenseTableBody');
+            tbody.innerHTML = '';
+
+            const licenses = JSON.parse(localStorage.getItem('licenses'));
+            const now = new Date();
+
+            licenses.forEach(license => {
+                const expires = new Date(license.createdAt);
+                expires.setHours(expires.getHours() + parseInt(license.duration));
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${license.key}</td>
+                    <td>${new Date(license.createdAt).toLocaleString()}</td>
+                    <td>${license.duration} saat</td>
+                    <td>${now > expires ? '<span style="color:red">Süresi Doldu</span>' : '<span style="color:green">Aktif</span>'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Sonuç gösterme
+        function showResult(element, message, isSuccess) {
+            element.textContent = message;
+            element.className = isSuccess ? 'success' : 'error';
+            element.style.display = 'block';
+        }
+
+        // Sayfa yüklendiğinde tabloyu güncelle
+        window.onload = updateLicenseTable;
     </script>
 </body>
 </html>
